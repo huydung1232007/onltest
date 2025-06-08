@@ -61,46 +61,49 @@
     button[type=submit]:hover{background:#084db3}
 
     /*================ MOBILE ENHANCEMENTS ================*/
-    @media (max-width: 1024px) and (orientation: landscape) {
-  .answer-pane {
-    height: 100vh !important;
-    bottom: 0 !important;
-    border-radius: 0 !important;
-    max-width: none !important;
-    left: 0; right: 0;
-  }
-  .sheet-header { border-radius: 0 !important;}
-  #answerArea { padding-top: 60px;}
+   @media (max-width: 1024px) {
+  .pdf-pane iframe { height: 56vh !important; }
   .mobile-bar {
-    padding: 4px 6px;
+    position:fixed; left:0; right:0; bottom:0; z-index:30;
+    display:flex; align-items:center; justify-content:space-between;
+    background: var(--brand); color:#fff;
+    font-weight:600; padding:8px 4px;
+    box-shadow: 0 -2px 10px rgba(0,0,0,.11);
   }
   .mobile-bar button {
-    font-size: 0.9rem;
-    padding: 5px 10px;
-    min-width: 65px;
+    border:none; background:#fff; color:var(--brand);
+    border-radius:8px; padding:8px 15px;
+    font-weight:600; font-size:1rem; margin-left:4px;
+    min-width: 82px;
   }
   .mobile-bar .mobile-time {
-    font-size: 2.2rem;
-    font-weight: bold;
-    min-width: 92px;
-    text-align: center;
-    margin-right: 6px;
-    letter-spacing: 2px;
+    font-size:2.1rem; font-weight:700; min-width:80px;
+    letter-spacing:1.5px; margin-right:8px;
   }
+  .answer-pane {
+    position:fixed; left:0; right:0; bottom:-100%; z-index:40;
+    height:99vh; background:#fff;
+    border-radius: 16px 16px 0 0;
+    box-shadow:0 -2px 18px rgba(232,67,147,0.11);
+    transition:bottom .32s;
+    display:block; overflow-y:auto;
+    max-width:none;
+  }
+  .answer-pane.open { bottom:0;}
+  .sheet-header {
+    height:50px; font-weight:700; display:flex; align-items:center;
+    justify-content:center; color:var(--brand); font-size:1.15rem;
+    border-bottom:1px solid #f5b2d1; background:#fff;
+    border-radius: 16px 16px 0 0;
+  }
+  .close-sheet {
+    position:absolute; top:14px; right:20px; font-size:1.8rem; color:#e84393;
+    background:none; border:none; cursor:pointer;
+  }
+  .timer-section { display:none; }
+  #answerArea { padding-top:60px;}
 }
-@media (max-width: 767px) {
-  .mobile-bar .mobile-time {
-    font-size: 1.5rem;
-    font-weight: 700;
-    min-width: 70px;
-    letter-spacing: 1px;
-  }
-  .mobile-bar button {
-    font-size: 1rem;
-    padding: 7px 10px;
-    min-width: 65px;
-  }
-}
+
   </style>
 </head>
 <body>
@@ -317,6 +320,19 @@ document.getElementById('toggleAnswer').addEventListener('click',()=>toggleAnswe
 window.addEventListener('click',e=>{
   if(window.innerWidth<768&&document.getElementById('answerPane').classList.contains('open')&&!document.getElementById('answerPane').contains(e.target)&&!document.getElementById('toggleAnswer').contains(e.target)) toggleAnswerSheet(false);
 });
+  // ... giữ nguyên phần render form ...
+function showMobileSheet() {
+  document.getElementById('answerPane').classList.add('open');
+}
+function hideMobileSheet() {
+  document.getElementById('answerPane').classList.remove('open');
+}
+document.getElementById('toggleSheet').onclick = showMobileSheet;
+document.getElementById('closeSheet').onclick = hideMobileSheet;
+document.getElementById('submitBtn').onclick = function() {
+  document.getElementById('quizForm').dispatchEvent(new Event('submit'));
+};
+
 </script>
 </body>
 </html>
