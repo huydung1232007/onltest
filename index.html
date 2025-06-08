@@ -3,116 +3,102 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0, user-scalable=yes">
-  <title>Bài Kiểm Tra Online</title>
+  <title>Thi Onl Với Huy Dũng – Chọn Đề</title>
   <style>
-    :root {
-      --brand: #0b5ed7;
-      --bg: #f5faff;
-      --border: #dfe1e5;
-      --row-alt: #e7f1ff;
-    }
+    :root{--brand:#0b5ed7;--bg:#f5faff;--border:#dfe1e5;--row-alt:#e7f1ff}
     *{box-sizing:border-box}
-    html,body{height:100%;margin:0;font-family:Arial,Helvetica,sans-serif;background:#fafafa;color:#333}
+    html,body{margin:0;height:100%;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:#333}
+    /* ====== SELECT SCREEN ====== */
+    #selectScreen{display:flex;flex-direction:column;align-items:center;min-height:100%;padding:32px 16px 64px;gap:18px}
+    .app-title{margin:0;font-size:2rem;font-weight:700;color:var(--brand);text-align:center}
+    #selectScreen h2{margin:0;font-size:1.2rem;color:#444;text-align:center}
+    .exam-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:16px;width:100%;max-width:720px}
+    .exam-card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:24px 12px;display:flex;align-items:center;justify-content:center;cursor:pointer;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.08);transition:transform .2s}
+    .exam-card:hover{transform:translateY(-3px)}
+    .exam-card span{font-weight:600;color:var(--brand);line-height:1.35}
 
-    /* ========= DESKTOP LAYOUT ========= */
+    /* ====== MAIN UI ====== */
+    #mainUI{display:none;height:100%}
     .page{display:flex;height:100%}
-    .pdf-pane{flex:0 0 55%;border-right:1px solid var(--border);overflow:hidden}
+    .pdf-pane{flex:0 0 55%;border-right:1px solid var(--border);overflow:auto;-webkit-overflow-scrolling:touch;background:#eee}
     .pdf-pane iframe{width:100%;height:100%;border:none}
-    .answer-pane{flex:1;display:flex;flex-direction:column;background:#fff;max-width:45%;transition:bottom .35s ease;}
-
-    /* ========= TIMER BAR (desktop) ========= */
-    .timer-section{position:sticky;top:0;background:#fff;padding:16px 24px 10px;border-bottom:1px solid var(--border);z-index:5;text-align:center}
-    .timer-section h2{margin:4px 0 8px;font-size:2.6rem;color:var(--brand)}
+    .answer-pane{flex:1;display:flex;flex-direction:column;position:relative;max-width:45%;background:#fff}
+    .back-btn{position:absolute;left:12px;top:12px;background:#fff;border:1px solid var(--border);color:var(--brand);font-size:1.2rem;border-radius:50%;width:34px;height:34px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10}
+    .back-btn:hover{background:var(--row-alt)}
+    .timer-section{position:sticky;top:0;background:#fff;padding:14px 24px 10px;border-bottom:1px solid var(--border);text-align:center}
+    .timer-section h2{margin:4px 0 6px;font-size:2.4rem;color:var(--brand)}
+    .timer-section .goodluck{margin:4px 0;font-weight:600;color:var(--brand)}
     .progress-wrapper{display:flex;align-items:center;gap:8px;font-size:.9rem;color:#666}
     .progress-wrapper progress{flex:1;height:6px}
-
-    /* ========= ANSWER AREA ========= */
     #answerArea{flex:1;overflow-y:auto;padding:24px;background:var(--bg)}
-    h1{text-align:center;margin-top:0;font-size:1.6rem}
-    h2.section-title{margin:28px 0 10px;color:var(--brand);font-size:1.25rem}
-    p.note{margin:0 0 14px;font-size:.9rem;color:#555}
-
-    /* --- table styles --- */
+    h1{text-align:center;margin:0 0 24px;font-size:1.6rem}
+    h2.section-title{margin:24px 0 10px;color:var(--brand);font-size:1.2rem}
+    p.note{margin:0 0 12px;font-size:.9rem;color:#555}
     table{width:100%;border-collapse:collapse}
-    table.question-table{margin-bottom:22px;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+    table.question-table{margin-bottom:20px;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.08)}
     table.question-table th,table.question-table td{padding:10px;text-align:center}
     table.question-table thead th{background:#e8f0fe}
     table.question-table tbody tr:nth-child(even){background:#f7f9fc}
     .row-label{text-align:left;font-weight:500;padding-left:16px}
-
-    .tf-group{background:#fff;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.08);margin-bottom:22px;overflow:hidden}
+    .tf-group{background:#fff;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.08);margin-bottom:20px}
     .tf-group h3{margin:0;padding:12px 16px;background:var(--row-alt);color:var(--brand);font-size:1rem}
-    .tf-group table td{padding:9px;text-align:center;font-size:.95rem}
+    .tf-group table td{padding:9px;text-align:center}
     .tf-group table tr:nth-child(even){background:#f9f9f9}
     .tf-group table td:first-child{width:40px;text-align:right;font-weight:500}
-
-    .short-answer-group{display:grid;gap:16px;margin-bottom:30px}
+    .short-answer-group{display:grid;gap:16px;margin-bottom:28px}
     .short-answer-group label{display:block;margin-bottom:4px;font-weight:500;font-size:.95rem}
     .short-answer-group input[type=text]{width:100%;padding:10px;border:1px solid var(--border);border-radius:4px;font-size:.95rem}
-
-    button[type=submit]{display:block;margin:28px auto 0;background:var(--brand);color:#fff;border:none;padding:12px 32px;font-size:1rem;border-radius:4px;cursor:pointer;transition:background .2s}
+    button[type=submit]{display:block;margin:24px auto 0;background:var(--brand);color:#fff;border:none;padding:12px 32px;font-size:1rem;border-radius:4px;cursor:pointer;transition:background .2s}
     button[type=submit]:hover{background:#084db3}
-
-    /* ========= MOBILE STYLES ========= */
-    @media (max-width: 768px){
-      html,body{height:auto;}
-      .page{flex-direction:column}
-      .pdf-pane{flex:none;height:auto;overflow:auto;-webkit-overflow-scrolling:touch}
-      .pdf-pane iframe{width:100%;height:100vh;border:none}
-      .answer-pane{position:fixed;left:0;bottom:-100%;width:100%;height:90vh;max-width:none;box-shadow:0 -2px 14px rgba(0,0,0,.25);border-top-left-radius:12px;border-top-right-radius:12px;overflow:hidden}
-      .answer-pane.open{bottom:0}
-      .timer-section{display:none}
-      .mobile-bar{position:fixed;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--brand);color:#fff;font-weight:600;z-index:6}
-      .mobile-bar button{border:none;background:#fff;color:var(--brand);border-radius:6px;padding:8px 12px;font-size:.95rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:4px}
-      .mobile-bar button#toggleSheet{background:rgba(255,255,255,.15);color:#fff}
-      .mobile-bar span.time{font-size:1.4rem;flex:1}
-      .close-sheet{position:absolute;top:10px;right:16px;font-size:1.5rem;font-weight:700;color:#666;cursor:pointer}
-      #answerArea{padding-top:60px}
-      .answer-pane header{position:absolute;top:0;left:0;right:0;height:50px;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-weight:600;color:var(--brand)}
-    }
   </style>
 </head>
 <body>
-<div class="page">
-  <div class="pdf-pane">
-    <iframe src="detoan7.pdf" title="Đề thi PDF"></iframe>
-    <p style="text-align:center;margin:8px 0;"><a href="detoan7.pdf" target="_blank" style="font-size:.9rem;color:#0b5ed7;text-decoration:underline">Mở toàn màn hình / Zoom PDF</a></p>
-  </div>
-  <div class="answer-pane" id="answerPane">
-    <header class="sheet-header" style="display:none">Bài làm</header>
-    <span class="close-sheet" id="closeSheet" style="display:none">✕</span>
-    <div class="timer-section" id="desktopTimer">
-      <p style="margin:0;font-weight:600;color:#888;font-size:.95rem">Thời gian làm bài:</p>
-      <h2 id="countdown">50:00</h2>
-      <div class="progress-wrapper"><progress id="progressBar" value="0" max="34"></progress><span id="progressText">0/34</span></div>
+  <!-- SELECT SCREEN -->
+  <section id="selectScreen">
+    <h1 class="app-title">Thi Onl Với Huy Dũng</h1>
+    <h2>Chọn Đề Thi</h2>
+    <div class="exam-grid" id="examGrid"></div>
+  </section>
+
+  <!-- MAIN UI -->
+  <section id="mainUI">
+    <div class="page">
+      <div class="pdf-pane"><iframe id="pdfFrame" src="" title="Đề thi PDF"></iframe></div>
+      <div class="answer-pane">
+        <button id="backBtn" class="back-btn" title="Quay lại">←</button>
+        <div class="timer-section">
+          <p style="margin:0;font-weight:600;color:#888;font-size:.9rem">Thời gian làm bài:</p>
+          <p class="goodluck">Chúc bạn thi tốt nhé!</p>
+          <h2 id="countdown">00:00</h2>
+          <div class="progress-wrapper"><progress id="progressBar" value="0" max="34"></progress><span id="progressText">0/34</span></div>
+        </div>
+        <div id="answerArea"></div>
+      </div>
     </div>
-    <div id="answerArea">
-      <form id="quizForm">
-        <h1>BÀI KIỂM TRA ONLINE</h1>
-        <h2 class="section-title">PHẦN I – Trắc nghiệm (12 câu)</h2>
-        <p class="note">Chọn 1 đáp án đúng cho mỗi câu.</p>
-        <table class="question-table"><thead><tr><th></th><th>A</th><th>B</th><th>C</th><th>D</th></tr></thead><tbody id="mcBody"></tbody></table>
-        <h2 class="section-title">PHẦN II – Đúng / Sai (4 câu, mỗi câu 4 ý a–d)</h2>
-        <p class="note">Chọn "Đúng" hoặc "Sai" cho từng ý.</p>
-        <div id="tfContainer"></div>
-        <h2 class="section-title">PHẦN III – Trả lời ngắn (6 câu)</h2>
-        <div id="saContainer" class="short-answer-group"></div>
-        <button type="submit">Nộp bài</button>
-      </form>
-    </div>
-  </div>
-</div>
-<div class="mobile-bar" id="mobileBar" style="display:none"><span class="time" id="mobileCountdown">50:00</span><button id="toggleSheet">Bài làm ▾</button><button id="submitBtn">Nộp bài</button></div>
+  </section>
+
 <script>
-document.addEventListener('DOMContentLoaded',()=>{renderMC();renderTF();renderSA();initTimer();initMobile();updateProgress();});
-function renderMC(){const tb=document.getElementById('mcBody');for(let i=1;i<=12;i++){const tr=document.createElement('tr');const tdL=document.createElement('td');tdL.className='row-label';tdL.textContent='Câu '+i;tr.appendChild(tdL);['A','B','C','D'].forEach(o=>{const td=document.createElement('td');const inp=document.createElement('input');inp.type='radio';inp.name='q'+i;inp.value=o;if(o==='A')inp.required=true;td.appendChild(inp);tr.appendChild(td);});tb.appendChild(tr);}}
-function renderTF(){const ct=document.getElementById('tfContainer');for(let g=1;g<=4;g++){const gp=document.createElement('div');gp.className='tf-group';const h=document.createElement('h3');h.textContent='Câu Đ/S '+g;gp.appendChild(h);const tbl=document.createElement('table');const tb=document.createElement('tbody');['a','b','c','d'].forEach(l=>{const tr=document.createElement('tr');const tdL=document.createElement('td');tdL.textContent=l+')';tr.appendChild(tdL);['true','false'].forEach(v=>{const td=document.createElement('td');const label=document.createElement('label');const inp=document.createElement('input');inp.type='radio';inp.name=`tf${g}${l}`;inp.value=v;if(v==='true')inp.required=true;label.appendChild(inp);label.appendChild(document.createTextNode(v==='true'?' Đúng':' Sai'));td.appendChild(label);tr.appendChild(td);});tb.appendChild(tr);});tbl.appendChild(tb);gp.appendChild(tbl);ct.appendChild(gp);}}
-function renderSA(){const c=document.getElementById('saContainer');for(let i=1;i<=6;i++){const wrap=document.createElement('div');const lab=document.createElement('label');lab.setAttribute('for','sa'+i);lab.textContent='Câu III.'+i;const inp=document.createElement('input');inp.type='text';inp.id='sa'+i;inp.name='sa'+i;inp.required=true;wrap.appendChild(lab);wrap.appendChild(inp);c.appendChild(wrap);}}
-const TOTAL=34;let timeLeft=50*60;const cd=document.getElementById('countdown'),cdM=document.getElementById('mobileCountdown');function tick(){const m=String(Math.floor(timeLeft/60)).padStart(2,'0');const s=String(timeLeft%60).padStart(2,'0');cd&&(cd.textContent=`${m}:${s}`);cdM&&(cdM.textContent=`${m}:${s}`);if(timeLeft===0){clearInterval(tim);alert('Hết giờ!');document.getElementById('quizForm').dispatchEvent(new Event('submit'));}timeLeft--;}let tim;function initTimer(){tick();tim=setInterval(tick,1000);}
-const bar=document.getElementById('progressBar'),txt=document.getElementById('progressText');function updateProgress(){let a=0;document.querySelectorAll('#quizForm input').forEach(i=>{if(i.type==='radio'&&i.checked)a++;if(i.type==='text'&&i.value.trim()!=='')a++;});bar&&(bar.value=a,txt.textContent=`${a}/${TOTAL}`);}document.getElementById('quizForm').addEventListener('input',updateProgress);
-function initMobile(){if(window.matchMedia('(max-width:768px)').matches){document.getElementById('mobileBar').style.display='flex';document.querySelector('.sheet-header').style.display='flex';document.getElementById('closeSheet').style.display='block';}}
-const pane=document.getElementById('answerPane'),tgl=document.getElementById('toggleSheet'),cls=document.getElementById('closeSheet');tgl&&tgl.addEventListener('click',()=>{const o=pane.classList.toggle('open');tgl.textContent=o?'Bài làm ▴':'Bài làm ▾';});cls&&cls.addEventListener('click',()=>{pane.classList.remove('open');tgl.textContent='Bài làm ▾';});document.getElementById('submitBtn')?.addEventListener('click',()=>document.getElementById('quizForm').dispatchEvent(new Event('submit')));
-document.getElementById('quizForm').addEventListener('submit',e=>{e.preventDefault();const fd=new FormData(e.target);const o={};for(const [k,v] of fd.entries())o[k]=v;console.table(o);alert('Đã nộp!');});
-</script>
-</body>
-</html>
+/* ===================== DATA ===================== */
+const exams=[
+  {id:'de1',title:'Đề Minh Hoạ Toán 01',pdf:'de_toan_1.pdf'},
+  {id:'de2',title:'Đề Minh Hoạ Hoá 02',pdf:'de_hoa_2.pdf'},
+  {id:'de3',title:'Đề Tinh Tú Tenschool số 7',pdf:'detoan7.pdf'},
+  {id:'de4',title:'Đề Lý Thử nghiệm 04',pdf:'de_ly_4.pdf'},
+  {id:'de5',title:'Đề Anh Thử nghiệm 05',pdf:'de_anh_5.pdf'},
+  {id:'de6',title:'Đề Sử Thử nghiệm 06',pdf:'de_su_6.pdf'},
+  {id:'de7',title:'Đề Địa Thử nghiệm 07',pdf:'de_dia_7.pdf'},
+  {id:'de8',title:'Đề Sinh Thử nghiệm 08',pdf:'de_sinh_8.pdf'}
+];
+
+/* =================== RENDER EXAM CARDS =================== */
+const grid=document.getElementById('examGrid');function renderCards(){grid.innerHTML='';exams.forEach((ex,i)=>{const card=document.createElement('div');card.className='exam-card';card.innerHTML=`<span>${ex.title}</span>`;card.onclick=()=>chooseExam(i);grid.appendChild(card);});}
+renderCards();
+
+/* =================== CHOOSE EXAM =================== */
+function chooseExam(idx){const ex=exams[idx];document.getElementById('pdfFrame').src=ex.pdf;document.getElementById('selectScreen').style.display='none';document.getElementById('mainUI').style.display='block';buildForm();startTimer();updateProgress();}
+
+/* =================== BACK BUTTON =================== */
+const backBtn=document.getElementById('backBtn');backBtn.addEventListener('click',()=>{clearInterval(timer);document.getElementById('mainUI').style.display='none';document.getElementById('selectScreen').style.display='flex';document.getElementById('pdfFrame').src='';});
+
+/* =================== BUILD FORM =================== */
+function buildForm(){const wrap=document.getElementById('answerArea');wrap.innerHTML='<form id="quizForm"></form>';const f=document.getElementById('quizForm');f.innerHTML='<h1>BÀI KIỂM TRA ONLINE</h1>';renderMC(f);renderTF(f
