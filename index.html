@@ -60,20 +60,23 @@
     button[type=submit]:hover{background:#084db3}
 
     /*================ MOBILE ENHANCEMENTS ================*/
-    @media(max-width:767px){
+        @media(max-width:767px){
       .page{flex-direction:column}
       .pdf-pane{flex:none;height:60vh;border-right:none}
-      .answer-pane{position:fixed;left:0;bottom:-100%;width:100%;height:70vh;transition:bottom .35s ease-in-out;box-shadow:0 -2px 12px rgba(0,0,0,.25);border-top-left-radius:16px;border-top-right-radius:16px;z-index:888}
+      /* slide‑up sheet full width */
+      .answer-pane{position:fixed;top:0;bottom:0;left:0;right:0;height:100vh;transition:bottom .35s ease-in-out;box-shadow:0 -2px 12px rgba(0,0,0,.25);border-top-left-radius:16px;border-top-right-radius:16px;z-index:888}
       .answer-pane.open{bottom:0}
       .back-btn{display:none}
       /* bottom bar */
-      .mobile-bar{position:fixed;left:0;right:0;bottom:0;background:var(--brand);display:flex;align-items:center;padding:6px 8px;gap:8px;z-index:889}
-      .mobile-bar .mobile-time{color:#fff;font-weight:600;font-size:1rem;margin-right:4px;min-width:56px;text-align:center}
-      .mobile-bar button{flex:1;border:none;border-radius:8px;font-size:1rem;font-weight:600;padding:10px 0}
+      .mobile-bar{position:fixed;left:0;right:0;bottom:0;background:var(--brand);display:flex;align-items:center;padding:4px 4px;gap:4px;z-index:889}
+      .mobile-time{flex:0 0 100px;color:#fff;font-weight:700;font-size:1.6rem;text-align:center;line-height:1}
+      .mobile-bar button{flex:1;border:none;border-radius:6px;font-size:.8rem;font-weight:600;padding:6px 0}
       #toggleAnswer{background:rgba(255,255,255,.15);color:#fff}
       #submitMobile{background:#fff;color:var(--brand)}
+      /* bigger timer in sheet */
+      .timer-section h2{font-size:3rem}
       .timer-section{border-radius:16px 16px 0 0}
-      #answerArea{padding-bottom:90px}
+      #answerArea{padding-bottom:90px;overflow-y:auto}
     }
   </style>
 </head>
