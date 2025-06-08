@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bài Kiểm Tra Online</title>
+  <style>
+    :root {
+      --brand: #1a73e8;
+      --bg: #f5faff;
+      --border: #dfe1e5;
+      --row-alt: #e7f1ff;
+    }
+    html,body{height:100%;margin:0;font-family:Arial,Helvetica,sans-serif;background:#fafafa;color:#333}
+
+    /* ===== LAYOUT ===== */
+    .container{display:flex;height:100%}
+    .left-panel{flex:0 0 55%;border-right:1px solid var(--border);overflow:hidden}
+    .left-panel iframe{width:100%;height:100%;border:none}
+    .right-panel{flex:1;display:flex;flex-direction:column;max-width:45%;background:#fff}
+
+    /* ===== TIMER ===== */
+    .timer-section{position:sticky;top:0;background:#fff;padding:16px 24px 10px;border-bottom:1px solid var(--border);z-index:5;text-align:center}
+    .timer-section h2{margin:4px 0 8px;font-size:2.8rem;color:var(--brand)}
+    .progress-wrapper{display:flex;align-items:center;gap:8px;font-size:.9rem;color:#666}
+    .progress-wrapper progress{flex:1;height:6px}
+
+    /* ===== ANSWER AREA ===== */
+    #answerArea{flex:1;overflow-y:auto;padding:24px;background:var(--bg)}
+    h1{text-align:center;margin-top:0}
+    h2.section-title{margin:32px 0 10px;color:var(--brand)}
+    p.note{margin:0 0 16px;font-size:.9rem;color:#555}
+
+    /* ===== TABLES ===== */
+    table.question-table,table.tf-table{width:100%;border-collapse:collapse}
+    table.question-table{margin-bottom:24px;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+    table.question-table th,table.question-table td{padding:10px;text-align:center}
+    table.question-table thead th{background:#e8f0fe}
+    table.question-table tbody tr:nth-child(even){background:#f7f9fc}
+    .row-label{text-align:left;font-weight:500;padding-left:16px}
+
+    .tf-group{background:#fff;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.08);margin-bottom:24px;overflow:hidden}
+    .tf-group h3{margin:0;padding:12px 16px;background:var(--row-alt);color:var(--brand)}
+    table.tf-table td{padding:10px;text-align:center}
+    table.tf-table tr:nth-child(even){background:#f9f9f9}
+    table.tf-table td:first-child{width:40px;text-align:right;font-weight:500}
+
+    /* ===== SHORT ANSWER ===== */
+    .short-answer-group{display:grid;grid-template-columns:1fr;gap:16px;margin-bottom:32px}
+    .short-answer-group label{display:block;margin-bottom:4px;font-weight:500}
+    .short-answer-group input[type=text]{width:100%;padding:10px;border:1px solid var(--border);border-radius:4px}
+
+    /* ===== BUTTON ===== */
+    button[type=submit]{display:block;margin:32px auto 0;background:var(--brand);color:#fff;border:none;padding:12px 32px;font-size:1rem;border-radius:4px;cursor:pointer;transition:background .2s}
+    button[type=submit]:hover{background:#155ec4}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- ===== PDF ===== -->
+    <div class="left-panel"><iframe src="exam.pdf" title="Đề thi PDF"></iframe></div>
+
+    <!-- ===== ANSWER PANEL ===== -->
+    <div class="right-panel">
+      <!-- TIMER -->
+      <div class="timer-section">
+        <p style="margin:0;font-weight:600;color:#888">Thời gian làm bài:</p>
+        <h2 id="countdown">50:00</h2>
+        <div class="progress-wrapper"><progress id="progressBar" value="0" max="34"></progress><span id="progressText">0/34</span></div>
+      </div>
+
+      <!-- FORM -->
+      <div id="answerArea">
+        <form id="quizForm">
+          <h1>BÀI KIỂM TRA ONLINE</h1>
+
+          <!-- PHẦN I -->
+          <h2 class="section-title">PHẦN I – Trắc nghiệm (12 câu)</h2>
+          <p class="note">Chọn 1 đáp án đúng cho mỗi câu.</p>
+          <table class="question-table" aria-label="Phần I – Nhiều lựa chọn">
+            <thead><tr><th></th><th>A</th><th>B</th><th>C</th><th>D</th></tr></thead>
+            <tbody>
+              <!-- 12 rows -->
+              ${Array.from({length:12},(_,i)=>`<tr><td class="row-label">Câu ${i+1}</td>${['A','B','C','D'].map(opt=>`<td><input type="radio" name="q${i+1}" value="${opt}" ${opt==='A'?'required':''}></td>`).join('')}</tr>`).join('')}
+            </tbody>
+          </table>
+
+          <!-- PHẦN II -->
+          <h2 class="section-title">PHẦN II – Đúng / Sai (4 câu, mỗi câu 4 ý a–d)</h2>
+          <p class="note">Chọn "Đúng" hoặc "Sai" cho từng ý.</p>
+
+          <!-- TF Groups -->
+          ${Array.from({length:4},(_,g)=>{
+            const gnum=g+1;
+            const rows=['a','b','c','d'].map(l=>`<tr><td>${l})</td><td><label><input type="radio" name="tf${gnum}${l}" value="true" required> Đúng</label></td><td><label><input type="radio" name="tf${gnum}${l}" value="false"> Sai</label></td></tr>`).join('');
+            return `<div class="tf-group"><h3>Câu Đ/S ${gnum}</h3><table class="tf-table"><tbody>${rows}</tbody></table></div>`;
+          }).join('')}
+
+          <!-- PHẦN III -->
+          <h2 class="section-title">PHẦN III – Trả lời ngắn (6 câu)</h2>
+          <div class="short-answer-group">
+            ${Array.from({length:6},(_,i)=>`<div><label for="sa${i+1}">Câu III.${i+1}</label><input type="text" id="sa${i+1}" name="sa${i+1}" required></div>`).join('')}
+          </div>
+
+          <button type="submit">Nộp bài</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ===== COUNTDOWN ===== */
+    const COUNTDOWN_MIN=50;let timeLeft=COUNTDOWN_MIN*60;const cd=document.getElementById('countdown');const timer=setInterval(()=>{const m=String(Math.floor(timeLeft/60)).padStart(2,'0');const s=String(timeLeft%60).padStart(2,'0');cd.textContent=`${m}:${s}`;if(timeLeft===0){clearInterval(timer);alert('Hết thời gian! Bài sẽ được nộp tự động.');document.getElementById('quizForm').dispatchEvent(new Event('submit'));}timeLeft--;},1000);
+
+    /* ===== PROGRESS ===== */
+    const TOTAL=34;const bar=document.getElementById('progressBar');const txt=document.getElementById('progressText');function updateProgress(){let answered=0;document.querySelectorAll('#quizForm input').forEach(el=>{if(el.type==='radio'&&el.checked)answered++;if(el.type==='text'&&el.value.trim()!=='')answered++;});bar.value=answered;txt.textContent=`${answered}/${TOTAL}`;}
+    document.getElementById('quizForm').addEventListener('input',updateProgress);updateProgress();
+
+    /* ===== SUBMIT ===== */
+    document.getElementById('quizForm').addEventListener('submit',e=>{e.preventDefault();const fd=new FormData(e.target);const out={};for(const [k,v] of fd.entries())out[k]=v;console.table(out);alert('Bài làm của bạn đã được ghi nhận!');});
+  </script>
+</body>
+</html>
