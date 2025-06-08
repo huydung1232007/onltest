@@ -1,55 +1,336 @@
+<!-- Updated mobile‑friendly version of the quiz app.
+     Key changes:
+      1. Added a fixed bottom bar on small screens with “Bài làm” (toggle answer sheet) & “Nộp bài”.
+      2. Answer pane becomes a slide‑up bottom sheet (<768 px) hidden by default; toggled via JS.
+      3. Progress counter mirrors desktop progress.
+      4. Improved media queries for layout swapping and better touch targets.  -->
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0, user-scalable=yes">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0, user-scalable=yes" />
   <title>Thi Onl Với Huy Dũng – Chọn Đề</title>
   <style>
-    :root{--brand:#0b5ed7;--bg:#f5faff;--border:#dfe1e5;--row-alt:#e7f1ff}
-    *{box-sizing:border-box}
-    html,body{margin:0;height:100%;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:#333}
-    /* ====== SELECT SCREEN ====== */
-    #selectScreen{display:flex;flex-direction:column;align-items:center;min-height:100%;padding:32px 16px 64px;gap:18px}
-    .app-title{margin:0;font-size:2rem;font-weight:700;color:var(--brand);text-align:center}
-    #selectScreen h2{margin:0;font-size:1.2rem;color:#444;text-align:center}
-    .exam-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:16px;width:100%;max-width:720px}
-    .exam-card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:24px 12px;display:flex;align-items:center;justify-content:center;cursor:pointer;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.08);transition:transform .2s}
-    .exam-card:hover{transform:translateY(-3px)}
-    .exam-card span{font-weight:600;color:var(--brand);line-height:1.35}
+    :root {
+      --brand: #0b5ed7;
+      --bg: #f5faff;
+      --border: #dfe1e5;
+      --row-alt: #e7f1ff;
+    }
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+    html,
+    body {
+      margin: 0;
+      height: 100%;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: #333;
+    }
 
-    /* ====== MAIN UI ====== */
-    #mainUI{display:none;height:100%}
-    .page{display:flex;height:100%}
-    .pdf-pane{flex:0 0 55%;border-right:1px solid var(--border);overflow:auto;-webkit-overflow-scrolling:touch;background:#eee}
-    .pdf-pane iframe{width:100%;height:100%;border:none}
-    .answer-pane{flex:1;display:flex;flex-direction:column;position:relative;max-width:45%;background:#fff}
-    .back-btn{position:absolute;left:12px;top:12px;background:#fff;border:1px solid var(--border);color:var(--brand);font-size:1.2rem;border-radius:50%;width:34px;height:34px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10}
-    .back-btn:hover{background:var(--row-alt)}
-    .timer-section{position:sticky;top:0;background:#fff;padding:14px 24px 10px;border-bottom:1px solid var(--border);text-align:center}
-    .timer-section h2{margin:4px 0 6px;font-size:2.4rem;color:var(--brand)}
-    .timer-section .goodluck{margin:4px 0;font-weight:600;color:var(--brand)}
-    .progress-wrapper{display:flex;align-items:center;gap:8px;font-size:.9rem;color:#666}
-    .progress-wrapper progress{flex:1;height:6px}
-    #answerArea{flex:1;overflow-y:auto;padding:24px;background:var(--bg)}
-    h1{text-align:center;margin:0 0 24px;font-size:1.6rem}
-    h2.section-title{margin:24px 0 10px;color:var(--brand);font-size:1.2rem}
-    p.note{margin:0 0 12px;font-size:.9rem;color:#555}
-    table{width:100%;border-collapse:collapse}
-    table.question-table{margin-bottom:20px;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.08)}
-    table.question-table th,table.question-table td{padding:10px;text-align:center}
-    table.question-table thead th{background:#e8f0fe}
-    table.question-table tbody tr:nth-child(even){background:#f7f9fc}
-    .row-label{text-align:left;font-weight:500;padding-left:16px}
-    .tf-group{background:#fff;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.08);margin-bottom:20px}
-    .tf-group h3{margin:0;padding:12px 16px;background:var(--row-alt);color:var(--brand);font-size:1rem}
-    .tf-group table td{padding:9px;text-align:center}
-    .tf-group table tr:nth-child(even){background:#f9f9f9}
-    .tf-group table td:first-child{width:40px;text-align:right;font-weight:500}
-    .short-answer-group{display:grid;gap:16px;margin-bottom:28px}
-    .short-answer-group label{display:block;margin-bottom:4px;font-weight:500;font-size:.95rem}
-    .short-answer-group input[type=text]{width:100%;padding:10px;border:1px solid var(--border);border-radius:4px;font-size:.95rem}
-    button[type=submit]{display:block;margin:24px auto 0;background:var(--brand);color:#fff;border:none;padding:12px 32px;font-size:1rem;border-radius:4px;cursor:pointer;transition:background .2s}
-    button[type=submit]:hover{background:#084db3}
+    /* ============== SELECT SCREEN ============== */
+    #selectScreen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100%;
+      padding: 32px 16px 64px;
+      gap: 18px;
+    }
+    .app-title {
+      margin: 0;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--brand);
+      text-align: center;
+    }
+    #selectScreen h2 {
+      margin: 0;
+      font-size: 1.2rem;
+      color: #444;
+      text-align: center;
+    }
+    .exam-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 16px;
+      width: 100%;
+      max-width: 720px;
+    }
+    .exam-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 24px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      text-align: center;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+      transition: transform 0.2s;
+    }
+    .exam-card:hover {
+      transform: translateY(-3px);
+    }
+    .exam-card span {
+      font-weight: 600;
+      color: var(--brand);
+      line-height: 1.35;
+    }
+
+    /* ============== MAIN LAYOUT (desktop default) ============== */
+    #mainUI {
+      display: none;
+      height: 100%;
+    }
+    .page {
+      display: flex;
+      height: 100%;
+    }
+    .pdf-pane {
+      flex: 0 0 55%;
+      border-right: 1px solid var(--border);
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+      background: #eee;
+    }
+    .pdf-pane iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    .answer-pane {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      max-width: 45%;
+      background: #fff;
+    }
+    .back-btn {
+      position: absolute;
+      left: 12px;
+      top: 12px;
+      background: #fff;
+      border: 1px solid var(--border);
+      color: var(--brand);
+      font-size: 1.2rem;
+      border-radius: 50%;
+      width: 34px;
+      height: 34px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+    .back-btn:hover {
+      background: var(--row-alt);
+    }
+
+    .timer-section {
+      position: sticky;
+      top: 0;
+      background: #fff;
+      padding: 14px 24px 10px;
+      border-bottom: 1px solid var(--border);
+      text-align: center;
+    }
+    .timer-section h2 {
+      margin: 4px 0 6px;
+      font-size: 2.4rem;
+      color: var(--brand);
+    }
+    .timer-section .goodluck {
+      margin: 4px 0;
+      font-weight: 600;
+      color: var(--brand);
+    }
+    .progress-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      color: #666;
+    }
+    .progress-wrapper progress {
+      flex: 1;
+      height: 6px;
+    }
+
+    #answerArea {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      background: var(--bg);
+    }
+    h1 {
+      text-align: center;
+      margin: 0 0 24px;
+      font-size: 1.6rem;
+    }
+    h2.section-title {
+      margin: 24px 0 10px;
+      color: var(--brand);
+      font-size: 1.2rem;
+    }
+    p.note {
+      margin: 0 0 12px;
+      font-size: 0.9rem;
+      color: #555;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table.question-table {
+      margin-bottom: 20px;
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+    table.question-table th,
+    table.question-table td {
+      padding: 10px;
+      text-align: center;
+    }
+    table.question-table thead th {
+      background: #e8f0fe;
+    }
+    table.question-table tbody tr:nth-child(even) {
+      background: #f7f9fc;
+    }
+    .row-label {
+      text-align: left;
+      font-weight: 500;
+      padding-left: 16px;
+    }
+    .tf-group {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+      margin-bottom: 20px;
+    }
+    .tf-group h3 {
+      margin: 0;
+      padding: 12px 16px;
+      background: var(--row-alt);
+      color: var(--brand);
+      font-size: 1rem;
+    }
+    .tf-group table td {
+      padding: 9px;
+      text-align: center;
+    }
+    .tf-group table tr:nth-child(even) {
+      background: #f9f9f9;
+    }
+    .tf-group table td:first-child {
+      width: 40px;
+      text-align: right;
+      font-weight: 500;
+    }
+    .short-answer-group {
+      display: grid;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .short-answer-group label {
+      display: block;
+      margin-bottom: 4px;
+      font-weight: 500;
+      font-size: 0.95rem;
+    }
+    .short-answer-group input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 0.95rem;
+    }
+    button[type="submit"] {
+      display: block;
+      margin: 24px auto 0;
+      background: var(--brand);
+      color: #fff;
+      border: none;
+      padding: 12px 32px;
+      font-size: 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button[type="submit"]:hover {
+      background: #084db3;
+    }
+
+    /* ============== MOBILE ENHANCEMENTS ============== */
+    @media (max-width: 767px) {
+      .page {
+        flex-direction: column;
+      }
+      .pdf-pane {
+        flex: none;
+        height: 60vh;
+        border-right: none;
+      }
+      .answer-pane {
+        position: fixed;
+        left: 0;
+        bottom: -100%;
+        width: 100%;
+        max-width: none;
+        height: 70vh;
+        transition: bottom 0.35s ease-in-out;
+        box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.25);
+        border-top-left-radius: 16px;
+        border-top-right-radius: 16px;
+        z-index: 888;
+      }
+      .answer-pane.open {
+        bottom: 0;
+      }
+      .back-btn {
+        display: none; /* not needed on mobile */
+      }
+      /* Fixed bottom bar */
+      .mobile-bar {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: #fff;
+        border-top: 1px solid var(--border);
+        display: flex;
+        padding: 6px 8px;
+        gap: 8px;
+        z-index: 889;
+      }
+      .mobile-bar button {
+        flex: 1;
+        border: 1px solid var(--border);
+        background: var(--brand);
+        color: #fff;
+        padding: 10px 0;
+        font-size: 1rem;
+        border-radius: 8px;
+        font-weight: 600;
+      }
+      .mobile-bar button#toggleAnswer {
+        background: #fff;
+        color: var(--brand);
+      }
+      .timer-section {
+        border-radius: 16px 16px 0 0;
+      }
+      #answerArea {
+        padding-bottom: 90px; /* give room for keyboard */
+      }
+    }
   </style>
 </head>
 <body>
@@ -64,16 +345,23 @@
   <section id="mainUI">
     <div class="page">
       <div class="pdf-pane"><iframe id="pdfFrame" src="" title="Đề thi PDF"></iframe></div>
-      <div class="answer-pane">
+      <div class="answer-pane" id="answerPane">
         <button id="backBtn" class="back-btn" title="Quay lại">←</button>
         <div class="timer-section">
-          <p style="margin:0;font-weight:600;color:#888;font-size:.9rem">Thời gian làm bài:</p>
+          <p style="margin: 0; font-weight: 600; color: #888; font-size: 0.9rem">Thời gian làm bài:</p>
           <p class="goodluck">Chúc bạn thi tốt nhé!</p>
           <h2 id="countdown">00:00</h2>
-          <div class="progress-wrapper"><progress id="progressBar" value="0" max="34"></progress><span id="progressText">0/34</span></div>
+          <div class="progress-wrapper">
+            <progress id="progressBar" value="0" max="34"></progress><span id="progressText">0/34</span>
+          </div>
         </div>
         <div id="answerArea"></div>
       </div>
+    </div>
+    <!-- Mobile bottom bar -->
+    <div class="mobile-bar" id="mobileBar" style="display:none">
+      <button id="toggleAnswer">Bài làm <span id="mobileProgress">0/34</span></button>
+      <button id="submitMobile">Nộp bài</button>
     </div>
   </section>
 
@@ -110,17 +398,22 @@ function chooseExam(idx) {
   document.getElementById('pdfFrame').src = ex.pdf;
   document.getElementById('selectScreen').style.display = 'none';
   document.getElementById('mainUI').style.display = 'block';
+  // Show mobile bar only under 768px
+  if (window.innerWidth < 768) {
+    document.getElementById('mobileBar').style.display = 'flex';
+  }
   buildForm();
   startTimer();
   updateProgress();
 }
 
-/* ===================== NÚT BACK ===================== */
+/* ===================== NÚT BACK (desktop only) ===================== */
 document.getElementById('backBtn').addEventListener('click', () => {
   clearInterval(timer);
   document.getElementById('mainUI').style.display = 'none';
   document.getElementById('selectScreen').style.display = 'flex';
   document.getElementById('pdfFrame').src = '';
+  document.getElementById('mobileBar').style.display = 'none';
 });
 
 /* ===================== XÂY FORM BÀI LÀM ===================== */
@@ -135,6 +428,8 @@ function buildForm() {
   f.insertAdjacentHTML('beforeend', '<button type="submit">Nộp bài</button>');
   f.addEventListener('input', updateProgress);
   f.addEventListener('submit', submitHandler);
+  // Also connect mobile submit button
+  document.getElementById('submitMobile').onclick = () => f.requestSubmit();
 }
 
 function renderMC(parent) {
@@ -150,7 +445,9 @@ function renderMC(parent) {
     tb.insertAdjacentHTML('beforeend', `
       <tr>
         <td class="row-label">Câu ${i}</td>
-        ${['A','B','C','D'].map(o=>`<td><input type="radio" name="q${i}" value="${o}" ${o==='A'?'required':''}></td>`).join('')}
+        ${['A', 'B', 'C', 'D']
+          .map(o => `<td><input type="radio" name="q${i}" value="${o}" ${o === 'A' ? 'required' : ''}></td>`)
+          .join('')}
       </tr>`);
   }
 }
@@ -161,46 +458,59 @@ function renderTF(parent) {
     <p class="note">Chọn "Đúng" hoặc "Sai" cho từng ý.</p>
     <div id="tfContainer"></div>`);
   const ct = document.getElementById('tfContainer');
-  for (let g=1; g<=4; g++) {
-    const rows = ['a','b','c','d'].map(l=>`
+  for (let g = 1; g <= 4; g++) {
+    const rows = ['a', 'b', 'c', 'd']
+      .map(
+        l => `
       <tr>
         <td>${l})</td>
         <td><label><input type="radio" name="tf${g}${l}" value="true" required> Đúng</label></td>
         <td><label><input type="radio" name="tf${g}${l}" value="false"> Sai</label></td>
-      </tr>`).join('');
-    ct.insertAdjacentHTML('beforeend', `
+      </tr>`
+      )
+      .join('');
+    ct.insertAdjacentHTML(
+      'beforeend',
+      `
       <div class="tf-group">
         <h3>Câu Đ/S ${g}</h3>
         <table><tbody>${rows}</tbody></table>
-      </div>`);
+      </div>`
+    );
   }
 }
 
 function renderSA(parent) {
-  parent.insertAdjacentHTML('beforeend', `
+  parent.insertAdjacentHTML(
+    'beforeend',
+    `
     <h2 class="section-title">PHẦN III – Trả lời ngắn (6 câu)</h2>
-    <div id="saContainer" class="short-answer-group"></div>`);
+    <div id="saContainer" class="short-answer-group"></div>`
+  );
   const sc = document.getElementById('saContainer');
-  for (let i=1; i<=6; i++) {
-    sc.insertAdjacentHTML('beforeend', `
+  for (let i = 1; i <= 6; i++) {
+    sc.insertAdjacentHTML(
+      'beforeend',
+      `
       <div>
         <label for="sa${i}">Câu III.${i}</label>
         <input type="text" id="sa${i}" name="sa${i}" required>
-      </div>`);
+      </div>`
+    );
   }
 }
 
 /* ===================== TIMER & PROGRESS ===================== */
 let timer, totalSecs;
 function startTimer() {
-  totalSecs = 50*60;
+  totalSecs = 50 * 60;
   clearInterval(timer);
   tick();
   timer = setInterval(tick, 1000);
 }
 function tick() {
-  const m = String(Math.floor(totalSecs/60)).padStart(2,'0');
-  const s = String(totalSecs%60).padStart(2,'0');
+  const m = String(Math.floor(totalSecs / 60)).padStart(2, '0');
+  const s = String(totalSecs % 60).padStart(2, '0');
   document.getElementById('countdown').textContent = m + ':' + s;
   if (totalSecs-- <= 0) {
     clearInterval(timer);
@@ -211,12 +521,15 @@ function tick() {
 const TOTAL = 34;
 function updateProgress() {
   let ans = 0;
-  document.querySelectorAll('#quizForm input').forEach(i=>{
-    if (i.type==='radio' && i.checked) ans++;
-    if (i.type==='text' && i.value.trim()) ans++;
+  document.querySelectorAll('#quizForm input').forEach(i => {
+    if (i.type === 'radio' && i.checked) ans++;
+    if (i.type === 'text' && i.value.trim()) ans++;
   });
   document.getElementById('progressBar').value = ans;
   document.getElementById('progressText').textContent = ans + '/' + TOTAL;
+  // mobile counter
+  const mobileSpan = document.getElementById('mobileProgress');
+  if (mobileSpan) mobileSpan.textContent = ans + '/' + TOTAL;
 }
 
 /* ===================== SUBMIT HANDLER ===================== */
@@ -225,5 +538,38 @@ function submitHandler(e) {
   const data = Object.fromEntries(new FormData(e.target).entries());
   console.table(data);
   alert('Nộp bài thành công!');
+  // collapse answer sheet on mobile after submit
+  if (window.innerWidth < 768) {
+    toggleAnswerSheet(false);
+  }
 }
+
+/* ===================== MOBILE SHEET TOGGLE ===================== */
+function toggleAnswerSheet(force) {
+  const pane = document.getElementById('answerPane');
+  const isOpen = pane.classList.contains('open');
+  const willOpen = typeof force === 'boolean' ? force : !isOpen;
+  if (willOpen) {
+    pane.classList.add('open');
+  } else {
+    pane.classList.remove('open');
+  }
+}
+if (document.getElementById('toggleAnswer')) {
+  document.getElementById('toggleAnswer').addEventListener('click', () => toggleAnswerSheet());
+}
+// Close the sheet when tapping outside (optional for usability)
+window.addEventListener('click', e => {
+  if (
+    window.innerWidth < 768 &&
+    document.getElementById('answerPane').classList.contains('open') &&
+    !document.getElementById('answerPane').contains(e.target) &&
+    !document.getElementById('toggleAnswer').contains(e.target)
+  ) {
+    toggleAnswerSheet(false);
+  }
+});
+
 </script>
+</body>
+</html>
