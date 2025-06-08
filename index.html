@@ -60,21 +60,46 @@
     button[type=submit]:hover{background:#084db3}
 
     /*================ MOBILE ENHANCEMENTS ================*/
-    @media(max-width:767px){
-      .page{flex-direction:column}
-      .pdf-pane{flex:none;height:60vh;border-right:none}
-      .answer-pane{position:fixed;left:0;bottom:-100%;width:100%;height:70vh;transition:bottom .35s ease-in-out;box-shadow:0 -2px 12px rgba(0,0,0,.25);border-top-left-radius:16px;border-top-right-radius:16px;z-index:888}
-      .answer-pane.open{bottom:0}
-      .back-btn{display:none}
-      /* bottom bar */
-      .mobile-bar{position:fixed;left:0;right:0;bottom:0;background:var(--brand);display:flex;align-items:center;padding:6px 8px;gap:8px;z-index:889}
-      .mobile-bar .mobile-time{color:#fff;font-weight:600;font-size:1rem;margin-right:4px;min-width:56px;text-align:center}
-      .mobile-bar button{flex:1;border:none;border-radius:8px;font-size:1rem;font-weight:600;padding:10px 0}
-      #toggleAnswer{background:rgba(255,255,255,.15);color:#fff}
-      #submitMobile{background:#fff;color:var(--brand)}
-      .timer-section{border-radius:16px 16px 0 0}
-      #answerArea{padding-bottom:90px}
-    }
+    @media (max-width: 1024px) and (orientation: landscape) {
+  .answer-pane {
+    height: 100vh !important;
+    bottom: 0 !important;
+    border-radius: 0 !important;
+    max-width: none !important;
+    left: 0; right: 0;
+  }
+  .sheet-header { border-radius: 0 !important;}
+  #answerArea { padding-top: 60px;}
+  .mobile-bar {
+    padding: 4px 6px;
+  }
+  .mobile-bar button {
+    font-size: 0.9rem;
+    padding: 5px 10px;
+    min-width: 65px;
+  }
+  .mobile-bar .mobile-time {
+    font-size: 2.2rem;
+    font-weight: bold;
+    min-width: 92px;
+    text-align: center;
+    margin-right: 6px;
+    letter-spacing: 2px;
+  }
+}
+@media (max-width: 767px) {
+  .mobile-bar .mobile-time {
+    font-size: 1.5rem;
+    font-weight: 700;
+    min-width: 70px;
+    letter-spacing: 1px;
+  }
+  .mobile-bar button {
+    font-size: 1rem;
+    padding: 7px 10px;
+    min-width: 65px;
+  }
+}
   </style>
 </head>
 <body>
