@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0, user-scalable=yes">
   <title>Bài Kiểm Tra Online</title>
   <style>
     :root {
@@ -55,8 +55,10 @@
 
     /* ========= MOBILE STYLES ========= */
     @media (max-width: 768px){
+      html,body{height:auto;}
       .page{flex-direction:column}
-      .pdf-pane{flex:1 1 auto}
+      .pdf-pane{flex:none;height:auto;overflow:auto;-webkit-overflow-scrolling:touch}
+      .pdf-pane iframe{width:100%;height:100vh;border:none}
       .answer-pane{position:fixed;left:0;bottom:-100%;width:100%;height:90vh;max-width:none;box-shadow:0 -2px 14px rgba(0,0,0,.25);border-top-left-radius:12px;border-top-right-radius:12px;overflow:hidden}
       .answer-pane.open{bottom:0}
       .timer-section{display:none}
@@ -64,9 +66,7 @@
       .mobile-bar button{border:none;background:#fff;color:var(--brand);border-radius:6px;padding:8px 12px;font-size:.95rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:4px}
       .mobile-bar button#toggleSheet{background:rgba(255,255,255,.15);color:#fff}
       .mobile-bar span.time{font-size:1.4rem;flex:1}
-      /* close icon */
       .close-sheet{position:absolute;top:10px;right:16px;font-size:1.5rem;font-weight:700;color:#666;cursor:pointer}
-      /* give answer area full height minus header */
       #answerArea{padding-top:60px}
       .answer-pane header{position:absolute;top:0;left:0;right:0;height:50px;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-weight:600;color:var(--brand)}
     }
