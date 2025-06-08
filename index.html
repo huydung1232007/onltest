@@ -32,7 +32,7 @@
     p.note{margin:0 0 16px;font-size:.9rem;color:#555}
 
     /* ===== TABLES ===== */
-    table.question-table,table.tf-table{width:100%;border-collapse:collapse}
+    table{width:100%;border-collapse:collapse}
     table.question-table{margin-bottom:24px;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.08)}
     table.question-table th,table.question-table td{padding:10px;text-align:center}
     table.question-table thead th{background:#e8f0fe}
@@ -41,9 +41,9 @@
 
     .tf-group{background:#fff;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.08);margin-bottom:24px;overflow:hidden}
     .tf-group h3{margin:0;padding:12px 16px;background:var(--row-alt);color:var(--brand)}
-    table.tf-table td{padding:10px;text-align:center}
-    table.tf-table tr:nth-child(even){background:#f9f9f9}
-    table.tf-table td:first-child{width:40px;text-align:right;font-weight:500}
+    .tf-group table td{padding:10px;text-align:center}
+    .tf-group table tr:nth-child(even){background:#f9f9f9}
+    .tf-group table td:first-child{width:40px;text-align:right;font-weight:500}
 
     /* ===== SHORT ANSWER ===== */
     .short-answer-group{display:grid;grid-template-columns:1fr;gap:16px;margin-bottom:32px}
@@ -58,7 +58,7 @@
 <body>
   <div class="container">
     <!-- ===== PDF ===== -->
-    <div class="left-panel"><iframe src="exam.pdf" title="Đề thi PDF"></iframe></div>
+    <div class="left-panel"><iframe src="detoan7.pdf" title="Đề thi PDF"></iframe></div>
 
     <!-- ===== ANSWER PANEL ===== -->
     <div class="right-panel">
@@ -79,28 +79,17 @@
           <p class="note">Chọn 1 đáp án đúng cho mỗi câu.</p>
           <table class="question-table" aria-label="Phần I – Nhiều lựa chọn">
             <thead><tr><th></th><th>A</th><th>B</th><th>C</th><th>D</th></tr></thead>
-            <tbody>
-              <!-- 12 rows -->
-              ${Array.from({length:12},(_,i)=>`<tr><td class="row-label">Câu ${i+1}</td>${['A','B','C','D'].map(opt=>`<td><input type="radio" name="q${i+1}" value="${opt}" ${opt==='A'?'required':''}></td>`).join('')}</tr>`).join('')}
-            </tbody>
+            <tbody id="mcBody"></tbody>
           </table>
 
           <!-- PHẦN II -->
           <h2 class="section-title">PHẦN II – Đúng / Sai (4 câu, mỗi câu 4 ý a–d)</h2>
           <p class="note">Chọn "Đúng" hoặc "Sai" cho từng ý.</p>
-
-          <!-- TF Groups -->
-          ${Array.from({length:4},(_,g)=>{
-            const gnum=g+1;
-            const rows=['a','b','c','d'].map(l=>`<tr><td>${l})</td><td><label><input type="radio" name="tf${gnum}${l}" value="true" required> Đúng</label></td><td><label><input type="radio" name="tf${gnum}${l}" value="false"> Sai</label></td></tr>`).join('');
-            return `<div class="tf-group"><h3>Câu Đ/S ${gnum}</h3><table class="tf-table"><tbody>${rows}</tbody></table></div>`;
-          }).join('')}
+          <div id="tfContainer"></div>
 
           <!-- PHẦN III -->
           <h2 class="section-title">PHẦN III – Trả lời ngắn (6 câu)</h2>
-          <div class="short-answer-group">
-            ${Array.from({length:6},(_,i)=>`<div><label for="sa${i+1}">Câu III.${i+1}</label><input type="text" id="sa${i+1}" name="sa${i+1}" required></div>`).join('')}
-          </div>
+          <div id="saContainer" class="short-answer-group"></div>
 
           <button type="submit">Nộp bài</button>
         </form>
@@ -109,15 +98,83 @@
   </div>
 
   <script>
+    /* ========== TẠO NỘI DUNG ĐỘNG ========== */
+    document.addEventListener('DOMContentLoaded',()=>{
+      renderMultipleChoice();
+      renderTrueFalse();
+      renderShortAnswers();
+      updateProgress();
+    });
+
+    function renderMultipleChoice(){
+      const tbody=document.getElementById('mcBody');
+      for(let i=1;i<=12;i++){
+        const tr=document.createElement('tr');
+        const label=document.createElement('td');label.className='row-label';label.textContent='Câu '+i;tr.appendChild(label);
+        ['A','B','C','D'].forEach((opt,idx)=>{
+          const td=document.createElement('td');
+          const input=document.createElement('input');input.type='radio';input.name='q'+i;input.value=opt; if(opt==='A') input.required=true;
+          td.appendChild(input);tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+      }
+    }
+
+    function renderTrueFalse(){
+      const container=document.getElementById('tfContainer');
+      for(let g=1;g<=4;g++){
+        const group=document.createElement('div');group.className='tf-group';
+        const title=document.createElement('h3');title.textContent='Câu Đ/S '+g;group.appendChild(title);
+        const table=document.createElement('table');table.className='tf-table';const tbody=document.createElement('tbody');
+        ['a','b','c','d'].forEach(letter=>{
+          const tr=document.createElement('tr');
+          const tdLabel=document.createElement('td');tdLabel.textContent=letter+')';tr.appendChild(tdLabel);
+          ['true','false'].forEach((val,idx)=>{
+            const td=document.createElement('td');
+            const labelEl=document.createElement('label');
+            const input=document.createElement('input');input.type='radio';input.name=`tf${g}${letter}`;input.value=val; if(val==='true') input.required=true;
+            labelEl.appendChild(input);labelEl.appendChild(document.createTextNode(val==='true'?' Đúng':' Sai'));
+            td.appendChild(labelEl);tr.appendChild(td);
+          });
+          tbody.appendChild(tr);
+        });
+        table.appendChild(tbody);group.appendChild(table);container.appendChild(group);
+      }
+    }
+
+    function renderShortAnswers(){
+      const sa=document.getElementById('saContainer');
+      for(let i=1;i<=6;i++){
+        const wrapper=document.createElement('div');
+        const label=document.createElement('label');label.setAttribute('for','sa'+i);label.textContent='Câu III.'+i;
+        const input=document.createElement('input');input.type='text';input.id='sa'+i;input.name='sa'+i;input.required=true;
+        wrapper.appendChild(label);wrapper.appendChild(input);sa.appendChild(wrapper);
+      }
+    }
+
     /* ===== COUNTDOWN ===== */
-    const COUNTDOWN_MIN=50;let timeLeft=COUNTDOWN_MIN*60;const cd=document.getElementById('countdown');const timer=setInterval(()=>{const m=String(Math.floor(timeLeft/60)).padStart(2,'0');const s=String(timeLeft%60).padStart(2,'0');cd.textContent=`${m}:${s}`;if(timeLeft===0){clearInterval(timer);alert('Hết thời gian! Bài sẽ được nộp tự động.');document.getElementById('quizForm').dispatchEvent(new Event('submit'));}timeLeft--;},1000);
+    const COUNTDOWN_MIN=50;let timeLeft=COUNTDOWN_MIN*60;const cd=document.getElementById('countdown');
+    const timer=setInterval(()=>{
+      const m=String(Math.floor(timeLeft/60)).padStart(2,'0');const s=String(timeLeft%60).padStart(2,'0');cd.textContent=`${m}:${s}`;
+      if(timeLeft===0){clearInterval(timer);alert('Hết thời gian! Bài sẽ được nộp tự động.');document.getElementById('quizForm').dispatchEvent(new Event('submit'));}
+      timeLeft--;},1000);
 
     /* ===== PROGRESS ===== */
-    const TOTAL=34;const bar=document.getElementById('progressBar');const txt=document.getElementById('progressText');function updateProgress(){let answered=0;document.querySelectorAll('#quizForm input').forEach(el=>{if(el.type==='radio'&&el.checked)answered++;if(el.type==='text'&&el.value.trim()!=='')answered++;});bar.value=answered;txt.textContent=`${answered}/${TOTAL}`;}
-    document.getElementById('quizForm').addEventListener('input',updateProgress);updateProgress();
+    const TOTAL=34;const bar=document.getElementById('progressBar');const txt=document.getElementById('progressText');
+    function updateProgress(){
+      let answered=0;
+      document.querySelectorAll('#quizForm input').forEach(el=>{
+        if(el.type==='radio'&&el.checked)answered++; if(el.type==='text'&&el.value.trim()!=='')answered++;});
+      bar.value=answered;txt.textContent=`${answered}/${TOTAL}`;
+    }
+    document.getElementById('quizForm').addEventListener('input',updateProgress);
 
     /* ===== SUBMIT ===== */
-    document.getElementById('quizForm').addEventListener('submit',e=>{e.preventDefault();const fd=new FormData(e.target);const out={};for(const [k,v] of fd.entries())out[k]=v;console.table(out);alert('Bài làm của bạn đã được ghi nhận!');});
+    document.getElementById('quizForm').addEventListener('submit',e=>{
+      e.preventDefault();
+      const fd=new FormData(e.target);const out={};for(const [k,v] of fd.entries())out[k]=v;console.table(out);
+      alert('Bài làm của bạn đã được ghi nhận!');
+    });
   </script>
 </body>
 </html>
