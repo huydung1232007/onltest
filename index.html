@@ -6,13 +6,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0, user-scalable=yes" />
   <title>Thi Online – Huy Dũng</title>
   <style>
-   :root {
-  --brand: #e84393; /* hoặc #ff3ba7 */
-  --bg: #f5faff;
-  --border: #dfe1e5;
-  --row-alt: #ffe3f4;
-}
-
+    :root {
+      --brand: #0b5ed7;
+      --bg: #f5faff;
+      --border: #dfe1e5;
+      --row-alt: #e7f1ff;
+    }
     *,*:before,*:after{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
     html,body{margin:0;height:100%;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:#333}
 
@@ -61,49 +60,21 @@
     button[type=submit]:hover{background:#084db3}
 
     /*================ MOBILE ENHANCEMENTS ================*/
-   @media (max-width: 1024px) {
-  .pdf-pane iframe { height: 56vh !important; }
-  .mobile-bar {
-    position:fixed; left:0; right:0; bottom:0; z-index:30;
-    display:flex; align-items:center; justify-content:space-between;
-    background: var(--brand); color:#fff;
-    font-weight:600; padding:8px 4px;
-    box-shadow: 0 -2px 10px rgba(0,0,0,.11);
-  }
-  .mobile-bar button {
-    border:none; background:#fff; color:var(--brand);
-    border-radius:8px; padding:8px 15px;
-    font-weight:600; font-size:1rem; margin-left:4px;
-    min-width: 82px;
-  }
-  .mobile-bar .mobile-time {
-    font-size:2.1rem; font-weight:700; min-width:80px;
-    letter-spacing:1.5px; margin-right:8px;
-  }
-  .answer-pane {
-    position:fixed; left:0; right:0; bottom:-100%; z-index:40;
-    height:99vh; background:#fff;
-    border-radius: 16px 16px 0 0;
-    box-shadow:0 -2px 18px rgba(232,67,147,0.11);
-    transition:bottom .32s;
-    display:block; overflow-y:auto;
-    max-width:none;
-  }
-  .answer-pane.open { bottom:0;}
-  .sheet-header {
-    height:50px; font-weight:700; display:flex; align-items:center;
-    justify-content:center; color:var(--brand); font-size:1.15rem;
-    border-bottom:1px solid #f5b2d1; background:#fff;
-    border-radius: 16px 16px 0 0;
-  }
-  .close-sheet {
-    position:absolute; top:14px; right:20px; font-size:1.8rem; color:#e84393;
-    background:none; border:none; cursor:pointer;
-  }
-  .timer-section { display:none; }
-  #answerArea { padding-top:60px;}
-}
-
+    @media(max-width:767px){
+      .page{flex-direction:column}
+      .pdf-pane{flex:none;height:60vh;border-right:none}
+      .answer-pane{position:fixed;left:0;bottom:-100%;width:100%;height:70vh;transition:bottom .35s ease-in-out;box-shadow:0 -2px 12px rgba(0,0,0,.25);border-top-left-radius:16px;border-top-right-radius:16px;z-index:888}
+      .answer-pane.open{bottom:0}
+      .back-btn{display:none}
+      /* bottom bar */
+      .mobile-bar{position:fixed;left:0;right:0;bottom:0;background:var(--brand);display:flex;align-items:center;padding:6px 8px;gap:8px;z-index:889}
+      .mobile-bar .mobile-time{color:#fff;font-weight:600;font-size:1rem;margin-right:4px;min-width:56px;text-align:center}
+      .mobile-bar button{flex:1;border:none;border-radius:8px;font-size:1rem;font-weight:600;padding:10px 0}
+      #toggleAnswer{background:rgba(255,255,255,.15);color:#fff}
+      #submitMobile{background:#fff;color:var(--brand)}
+      .timer-section{border-radius:16px 16px 0 0}
+      #answerArea{padding-bottom:90px}
+    }
   </style>
 </head>
 <body>
@@ -253,16 +224,6 @@ function renderSA(parent){
       </div>`);
   }
 }
-<div class="mobile-bar" id="mobileBar" style="display:none">
-  <span class="mobile-time" id="mobileCountdown">50:00</span>
-  <button id="toggleSheet">Bài làm</button>
-  <button id="submitBtn">Nộp bài</button>
-</div>
-<div class="mobile-bar" id="mobileBar" style="display:none">
-  <span class="mobile-time" id="mobileCountdown">50:00</span>
-  <button id="toggleSheet">Bài làm</button>
-  <button id="submitBtn">Nộp bài</button>
-</div>
 
 /* ===================== TIMER & PROGRESS ===================== */
 let timer,totalSecs;
@@ -320,19 +281,6 @@ document.getElementById('toggleAnswer').addEventListener('click',()=>toggleAnswe
 window.addEventListener('click',e=>{
   if(window.innerWidth<768&&document.getElementById('answerPane').classList.contains('open')&&!document.getElementById('answerPane').contains(e.target)&&!document.getElementById('toggleAnswer').contains(e.target)) toggleAnswerSheet(false);
 });
-  // ... giữ nguyên phần render form ...
-function showMobileSheet() {
-  document.getElementById('answerPane').classList.add('open');
-}
-function hideMobileSheet() {
-  document.getElementById('answerPane').classList.remove('open');
-}
-document.getElementById('toggleSheet').onclick = showMobileSheet;
-document.getElementById('closeSheet').onclick = hideMobileSheet;
-document.getElementById('submitBtn').onclick = function() {
-  document.getElementById('quizForm').dispatchEvent(new Event('submit'));
-};
-
 </script>
 </body>
 </html>
