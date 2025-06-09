@@ -15,7 +15,42 @@
     *,*:before,*:after{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
     html,body{margin:0;height:100%;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:#333}
 
-    /*================ SELECT SCREEN ================*/
+ /* ======= BOTTOM SHEET ĐÁP ÁN (MOBILE) ======= */
+.answer-sheet {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  background: #fff;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  box-shadow: 0 -2px 16px rgba(0,0,0,.22);
+  z-index: 9999;
+  max-height: 90vh;
+  height: 62vh;
+  transform: translateY(100%);
+  transition: transform .3s cubic-bezier(.4,0,.2,1);
+  display: flex;
+  flex-direction: column;
+}
+.answer-sheet.open { transform: translateY(0); }
+.sheet-header {
+  padding: 14px 20px 10px 20px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-bottom: 1px solid #e4e4e4;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.close-btn {
+  font-size: 2rem; cursor: pointer; line-height: 1;
+}
+.sheet-body {
+  overflow-y: auto; flex: 1; padding: 10px 6px;
+}
+.answer-table { width: 100%; border-collapse: collapse; }
+.answer-table th, .answer-table td { padding: 7px 0; text-align: center; }
+@media (min-width: 767px) {
+  .answer-sheet { display: none !important; }
+}
+   /*================ SELECT SCREEN ================*/
     #selectScreen{display:flex;flex-direction:column;align-items:center;min-height:100%;padding:32px 16px 64px;gap:18px}
     .app-title{margin:0;font-size:2rem;font-weight:700;color:var(--brand);text-align:center}
     #selectScreen h2{margin:0;font-size:1.2rem;color:#444;text-align:center}
@@ -281,6 +316,94 @@ document.getElementById('toggleAnswer').addEventListener('click',()=>toggleAnswe
 window.addEventListener('click',e=>{
   if(window.innerWidth<768&&document.getElementById('answerPane').classList.contains('open')&&!document.getElementById('answerPane').contains(e.target)&&!document.getElementById('toggleAnswer').contains(e.target)) toggleAnswerSheet(false);
 });
+// ==== RENDER TRẮC NGHIỆM TRONG BOTTOM SHEET ====
+function renderAnswerSheet() {
+  const tbody = document.getElementById('sheetTableBody');
+  tbody.innerHTML = '';
+  // Số câu trắc nghiệm, chỉnh đúng với đề (ở đây là 12, thay đổi nếu khác)
+  for (let i = 1; i <= 12; i++) {
+    tbody.innerHTML += `
+      <tr>
+        <td>Câu ${i}</td>
+        ${['A','B','C','D'].map(o => `
+          <td>
+            <input 
+              type="radio" 
+              name="sheet_q${i}" 
+              value="${o}" 
+              ${document.querySelector('input[name=q'+i+'][value='+o+']') && document.querySelector('input[name=q'+i+'][value='+o+']').checked ? 'checked' : ''}
+              onchange="syncSheetToForm(${i},'${o}')"
+              style="width:20px;height:20px;"
+            >
+          </td>
+        `).join('')}
+      </tr>
+    `;
+  }
+}
+renderAnswerSheet();
+
+// ==== ĐỒNG BỘ GIỮA SHEET & FORM CHÍNH ====
+function syncSheetToForm(idx, ans) {
+  let input = document.querySelector('input[name="q'+idx+'"][value="'+ans+'"]');
+  if(input) input.checked = true;
+}
+function syncFormToSheet() {
+  if(document.getElementById('answerSheet').classList.contains('open')) {
+    renderAnswerSheet();
+  }
+}
+for(let i=1;i<=12;i++) {
+  ['A','B','C','D'].forEach(o=>{
+    let q = document.querySelector('input[name="q'+i+'"][value="'+o+'"]');
+    if(q) q.addEventListener('change', syncFormToSheet);
+  });
+}
+
+// ==== SHOW/HIDE SHEET ====
+function toggleAnswerSheet(force) {
+  const sheet = document.getElementById('answerSheet');
+  const isOpen = sheet.classList.contains('open');
+  const willOpen = typeof force === 'boolean' ? force : !isOpen;
+  if(willOpen) {
+    renderAnswerSheet();
+    document.getElementById('sheetTimer').textContent = document.getElementById('countdown').textContent;
+    sheet.classList.add('open');
+  } else {
+    sheet.classList.remove('open');
+  }
+}
+document.getElementById('toggleAnswer').addEventListener('click',()=>toggleAnswerSheet(true));
+
+// Đồng bộ timer realtime (tối ưu UX)
+setInterval(()=>{
+  if(document.getElementById('answerSheet').classList.contains('open')){
+    document.getElementById('sheetTimer').textContent = document.getElementById('countdown').textContent;
+  }
+}, 1000);
+
 </script>
+<!-- Bottom Sheet Answer Sheet -->
+<div id="answerSheet" class="answer-sheet">
+  <div class="sheet-header">
+    <span>Thời gian làm bài: <b id="sheetTimer">50:00</b></span>
+    <span class="close-btn" onclick="toggleAnswerSheet(false)">×</span>
+  </div>
+  <div class="sheet-body">
+    <table class="answer-table">
+      <thead>
+        <tr>
+          <th>Câu</th>
+          <th>A</th>
+          <th>B</th>
+          <th>C</th>
+          <th>D</th>
+        </tr>
+      </thead>
+      <tbody id="sheetTableBody"></tbody>
+    </table>
+  </div>
+</div>
+
 </body>
 </html>
