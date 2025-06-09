@@ -95,21 +95,23 @@
     button[type=submit]:hover{background:#084db3}
 
     /*================ MOBILE ENHANCEMENTS ================*/
-    @media(max-width:767px){
+      @media (max-width: 768px){
+      html,body{height:auto;}
       .page{flex-direction:column}
-      .pdf-pane{flex:none;height:60vh;border-right:none}
-      .answer-pane{position:fixed;left:0;bottom:-100%;width:100%;height:70vh;transition:bottom .35s ease-in-out;box-shadow:0 -2px 12px rgba(0,0,0,.25);border-top-left-radius:16px;border-top-right-radius:16px;z-index:888}
+      .pdf-pane{flex:none;height:auto;overflow:auto;-webkit-overflow-scrolling:touch}
+      .pdf-pane iframe{width:100%;height:100vh;border:none}
+      .answer-pane{position:fixed;left:0;bottom:-100%;width:100%;height:90vh;max-width:none;box-shadow:0 -2px 14px rgba(0,0,0,.25);border-top-left-radius:12px;border-top-right-radius:12px;overflow:hidden}
       .answer-pane.open{bottom:0}
-      .back-btn{display:none}
-      /* bottom bar */
-      .mobile-bar{position:fixed;left:0;right:0;bottom:0;background:var(--brand);display:flex;align-items:center;padding:6px 8px;gap:8px;z-index:889}
-      .mobile-bar .mobile-time{color:#fff;font-weight:600;font-size:1rem;margin-right:4px;min-width:56px;text-align:center}
-      .mobile-bar button{flex:1;border:none;border-radius:8px;font-size:1rem;font-weight:600;padding:10px 0}
-      #toggleAnswer{background:rgba(255,255,255,.15);color:#fff}
-      #submitMobile{background:#fff;color:var(--brand)}
-      .timer-section{border-radius:16px 16px 0 0}
-      #answerArea{padding-bottom:90px}
+      .timer-section{display:none}
+      .mobile-bar{position:fixed;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--brand);color:#fff;font-weight:600;z-index:6}
+      .mobile-bar button{border:none;background:#fff;color:var(--brand);border-radius:6px;padding:8px 12px;font-size:.95rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:4px}
+      .mobile-bar button#toggleSheet{background:rgba(255,255,255,.15);color:#fff}
+      .mobile-bar span.time{font-size:1.4rem;flex:1}
+      .close-sheet{position:absolute;top:10px;right:16px;font-size:1.5rem;font-weight:700;color:#666;cursor:pointer}
+      #answerArea{padding-top:60px}
+      .answer-pane header{position:absolute;top:0;left:0;right:0;height:50px;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-weight:600;color:var(--brand)}
     }
+
   </style>
 </head>
 <body>
@@ -135,12 +137,8 @@
         <div id="answerArea"></div>
       </div>
     </div>
-    <!-- Mobile bottom bar -->
-    <div class="mobile-bar" id="mobileBar" style="display:none">
-      <span class="mobile-time" id="mobileTimer">00:00</span>
-      <button id="toggleAnswer">Bài làm ▼</button>
-      <button id="submitMobile">Nộp bài</button>
-    </div>
+   <div class="mobile-bar" id="mobileBar" style="display:none"><span class="time" id="mobileCountdown">50:00</span><button id="toggleSheet">Bài làm ▾</button><button id="submitBtn">Nộp bài</button></div>
+
   </section>
 
 <script>
