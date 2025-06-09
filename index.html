@@ -1,9 +1,10 @@
+<!-- Mobile layout: bottom-sheet answer panel styled per latest screenshot; removed progress count from “Bài làm” button; table header compact like mockup. -->
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0, user-scalable=yes">
-  <title>Bài Kiểm Tra Online</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0, user-scalable=yes" />
+  <title>Thi Online – Huy Dũng</title>
   <style>
     :root {
       --brand: #0b5ed7;
@@ -11,8 +12,17 @@
       --border: #dfe1e5;
       --row-alt: #e7f1ff;
     }
-    *{box-sizing:border-box}
-    html,body{height:100%;margin:0;font-family:Arial,Helvetica,sans-serif;background:#fafafa;color:#333}
+    *,*:before,*:after{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html,body{margin:0;height:100%;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:#333}
+ 
+  /*================ SELECT SCREEN ================*/
+    #selectScreen{display:flex;flex-direction:column;align-items:center;min-height:100%;padding:32px 16px 64px;gap:18px}
+    .app-title{margin:0;font-size:2rem;font-weight:700;color:var(--brand);text-align:center}
+    #selectScreen h2{margin:0;font-size:1.2rem;color:#444;text-align:center}
+    .exam-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:16px;width:100%;max-width:720px}
+    .exam-card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:24px 12px;display:flex;align-items:center;justify-content:center;cursor:pointer;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,0.08);transition:transform .2s}
+    .exam-card:hover{transform:translateY(-3px)}
+    .exam-card span{font-weight:600;color:var(--brand);line-height:1.35}
 
     /* ========= DESKTOP LAYOUT ========= */
     .page{display:flex;height:100%}
@@ -73,45 +83,189 @@
   </style>
 </head>
 <body>
-<div class="page">
-  <div class="pdf-pane">
-    <iframe src="detoan7.pdf" title="Đề thi PDF"></iframe>
-    <p style="text-align:center;margin:8px 0;"><a href="detoan7.pdf" target="_blank" style="font-size:.9rem;color:#0b5ed7;text-decoration:underline">Mở toàn màn hình / Zoom PDF</a></p>
-  </div>
-  <div class="answer-pane" id="answerPane">
-    <header class="sheet-header" style="display:none">Bài làm</header>
-    <span class="close-sheet" id="closeSheet" style="display:none">✕</span>
-    <div class="timer-section" id="desktopTimer">
-      <p style="margin:0;font-weight:600;color:#888;font-size:.95rem">Thời gian làm bài:</p>
-      <h2 id="countdown">50:00</h2>
-      <div class="progress-wrapper"><progress id="progressBar" value="0" max="34"></progress><span id="progressText">0/34</span></div>
+  <!-- SELECT SCREEN -->
+  <section id="selectScreen">
+    <h1 class="app-title">Thi Onl Với Huy Dũng</h1>
+    <h2>Chọn Đề Thi</h2>
+    <div class="exam-grid" id="examGrid"></div>
+  </section>
+
+  <!-- MAIN UI -->
+  <section id="mainUI">
+    <div class="page">
+      <div class="pdf-pane"><iframe id="pdfFrame" src="" title="Đề thi PDF"></iframe></div>
+      <div class="answer-pane" id="answerPane">
+        <button id="backBtn" class="back-btn" title="Quay lại">←</button>
+        <div class="timer-section">
+          <p style="margin:0;font-weight:600;color:#888;font-size:.9rem">Thời gian làm bài:</p>
+          <p class="goodluck" style="margin:4px 0">Chúc bạn thi tốt nhé!</p>
+          <h2 id="countdown">00:00</h2>
+          <div class="progress-wrapper"><progress id="progressBar" value="0" max="34"></progress><span id="progressText">0/34</span></div>
+        </div>
+        <div id="answerArea"></div>
+      </div>
     </div>
-    <div id="answerArea">
-      <form id="quizForm">
-        <h1>BÀI KIỂM TRA ONLINE</h1>
-        <h2 class="section-title">PHẦN I – Trắc nghiệm (12 câu)</h2>
-        <p class="note">Chọn 1 đáp án đúng cho mỗi câu.</p>
-        <table class="question-table"><thead><tr><th></th><th>A</th><th>B</th><th>C</th><th>D</th></tr></thead><tbody id="mcBody"></tbody></table>
-        <h2 class="section-title">PHẦN II – Đúng / Sai (4 câu, mỗi câu 4 ý a–d)</h2>
-        <p class="note">Chọn "Đúng" hoặc "Sai" cho từng ý.</p>
-        <div id="tfContainer"></div>
-        <h2 class="section-title">PHẦN III – Trả lời ngắn (6 câu)</h2>
-        <div id="saContainer" class="short-answer-group"></div>
-        <button type="submit">Nộp bài</button>
-      </form>
-    </div>
-  </div>
-</div>
-<div class="mobile-bar" id="mobileBar" style="display:none"><span class="time" id="mobileCountdown">50:00</span><button id="toggleSheet">Bài làm ▾</button><button id="submitBtn">Nộp bài</button></div>
+    <!-- Mobile bottom bar -->
+    <div class="mobile-bar" id="mobileBar" style="display:none"><span class="time" id="mobileCountdown">50:00</span><button id="toggleSheet">Bài làm ▾</button><button id="submitBtn">Nộp bài</button></div>
+</section>
+
 <script>
-document.addEventListener('DOMContentLoaded',()=>{renderMC();renderTF();renderSA();initTimer();initMobile();updateProgress();});
-function renderMC(){const tb=document.getElementById('mcBody');for(let i=1;i<=12;i++){const tr=document.createElement('tr');const tdL=document.createElement('td');tdL.className='row-label';tdL.textContent='Câu '+i;tr.appendChild(tdL);['A','B','C','D'].forEach(o=>{const td=document.createElement('td');const inp=document.createElement('input');inp.type='radio';inp.name='q'+i;inp.value=o;if(o==='A')inp.required=true;td.appendChild(inp);tr.appendChild(td);});tb.appendChild(tr);}}
-function renderTF(){const ct=document.getElementById('tfContainer');for(let g=1;g<=4;g++){const gp=document.createElement('div');gp.className='tf-group';const h=document.createElement('h3');h.textContent='Câu Đ/S '+g;gp.appendChild(h);const tbl=document.createElement('table');const tb=document.createElement('tbody');['a','b','c','d'].forEach(l=>{const tr=document.createElement('tr');const tdL=document.createElement('td');tdL.textContent=l+')';tr.appendChild(tdL);['true','false'].forEach(v=>{const td=document.createElement('td');const label=document.createElement('label');const inp=document.createElement('input');inp.type='radio';inp.name=`tf${g}${l}`;inp.value=v;if(v==='true')inp.required=true;label.appendChild(inp);label.appendChild(document.createTextNode(v==='true'?' Đúng':' Sai'));td.appendChild(label);tr.appendChild(td);});tb.appendChild(tr);});tbl.appendChild(tb);gp.appendChild(tbl);ct.appendChild(gp);}}
-function renderSA(){const c=document.getElementById('saContainer');for(let i=1;i<=6;i++){const wrap=document.createElement('div');const lab=document.createElement('label');lab.setAttribute('for','sa'+i);lab.textContent='Câu III.'+i;const inp=document.createElement('input');inp.type='text';inp.id='sa'+i;inp.name='sa'+i;inp.required=true;wrap.appendChild(lab);wrap.appendChild(inp);c.appendChild(wrap);}}
-const TOTAL=34;let timeLeft=50*60;const cd=document.getElementById('countdown'),cdM=document.getElementById('mobileCountdown');function tick(){const m=String(Math.floor(timeLeft/60)).padStart(2,'0');const s=String(timeLeft%60).padStart(2,'0');cd&&(cd.textContent=`${m}:${s}`);cdM&&(cdM.textContent=`${m}:${s}`);if(timeLeft===0){clearInterval(tim);alert('Hết giờ!');document.getElementById('quizForm').dispatchEvent(new Event('submit'));}timeLeft--;}let tim;function initTimer(){tick();tim=setInterval(tick,1000);}
-const bar=document.getElementById('progressBar'),txt=document.getElementById('progressText');function updateProgress(){let a=0;document.querySelectorAll('#quizForm input').forEach(i=>{if(i.type==='radio'&&i.checked)a++;if(i.type==='text'&&i.value.trim()!=='')a++;});bar&&(bar.value=a,txt.textContent=`${a}/${TOTAL}`);}document.getElementById('quizForm').addEventListener('input',updateProgress);
-function initMobile(){if(window.matchMedia('(max-width:768px)').matches){document.getElementById('mobileBar').style.display='flex';document.querySelector('.sheet-header').style.display='flex';document.getElementById('closeSheet').style.display='block';}}
-const pane=document.getElementById('answerPane'),tgl=document.getElementById('toggleSheet'),cls=document.getElementById('closeSheet');tgl&&tgl.addEventListener('click',()=>{const o=pane.classList.toggle('open');tgl.textContent=o?'Bài làm ▴':'Bài làm ▾';});cls&&cls.addEventListener('click',()=>{pane.classList.remove('open');tgl.textContent='Bài làm ▾';});document.getElementById('submitBtn')?.addEventListener('click',()=>document.getElementById('quizForm').dispatchEvent(new Event('submit')));
+/* ===================== DATA ===================== */
+const exams=[
+  {id:"de1",title:"Đề Minh Hoạ Toán 01",pdf:"de_toan_1.pdf"},
+  {id:"de2",title:"Đề Minh Hoạ Hoá 02",pdf:"de_hoa_2.pdf"},
+  {id:"de3",title:"Đề Tinh Tú Tenschool số 7",pdf:"detoan7.pdf"},
+  {id:"de4",title:"Đề Lý Thử nghiệm 04",pdf:"de_ly_4.pdf"},
+  {id:"de5",title:"Đề Anh Thử nghiệm 05",pdf:"de_anh_5.pdf"},
+  {id:"de6",title:"Đề Sử Thử nghiệm 06",pdf:"de_su_6.pdf"},
+  {id:"de7",title:"Đề Địa Thử nghiệm 07",pdf:"de_dia_7.pdf"},
+  {id:"de8",title:"Đề Sinh Thử nghiệm 08",pdf:"de_sinh_8.pdf"}
+];
+
+/* ===================== RENDER SELECT SCREEN ===================== */
+function renderCards(){
+  const grid=document.getElementById("examGrid");
+  grid.innerHTML="";
+  exams.forEach((ex,i)=>{
+    const card=document.createElement("div");
+    card.className="exam-card";
+    card.innerHTML=`<span>${ex.title}</span>`;
+    card.onclick=()=>chooseExam(i);
+    grid.appendChild(card);
+  });
+}
+renderCards();
+
+/* ===================== CHỌN ĐỀ ===================== */
+function chooseExam(idx){
+  const ex=exams[idx];
+  document.getElementById("pdfFrame").src=ex.pdf;
+  document.getElementById("selectScreen").style.display="none";
+  document.getElementById("mainUI").style.display="block";
+  if(window.innerWidth<768){
+    document.getElementById("mobileBar").style.display="flex";
+  }
+  buildForm();
+  startTimer();
+  updateProgress();
+}
+
+document.getElementById("backBtn").addEventListener("click",()=>{
+  clearInterval(timer);
+  document.getElementById("mainUI").style.display="none";
+  document.getElementById("selectScreen").style.display="flex";
+  document.getElementById("pdfFrame").src="";
+  document.getElementById("mobileBar").style.display="none";
+});
+
+/* ===================== XÂY FORM BÀI LÀM ===================== */
+function buildForm(){
+  const wrap=document.getElementById("answerArea");
+  wrap.innerHTML='<form id="quizForm"></form>';
+  const f=document.getElementById("quizForm");
+  f.innerHTML='<h1>BÀI KIỂM TRA ONLINE</h1>';
+  renderMC(f);
+  renderTF(f);
+  renderSA(f);
+  f.insertAdjacentHTML('beforeend','<button type="submit">Nộp bài</button>');
+  f.addEventListener('input',updateProgress);
+  f.addEventListener('submit',submitHandler);
+  document.getElementById('submitMobile').onclick=()=>f.requestSubmit();
+}
+
+function renderMC(parent){
+  parent.insertAdjacentHTML('beforeend',`
+    <h2 class="section-title">PHẦN I – Trắc nghiệm (12 câu)</h2>
+    <p class="note">Chọn 1 đáp án đúng cho mỗi câu.</p>
+    <table class="question-table">
+      <thead><tr><th>Câu</th><th colspan="4">Chọn đáp án</th></tr></thead>
+      <tbody id="mcBody"></tbody>
+    </table>`);
+  const tb=document.getElementById('mcBody');
+  for(let i=1;i<=12;i++){
+    tb.insertAdjacentHTML('beforeend',`
+      <tr>
+        <td class="row-label">Câu ${i}</td>
+        ${['A','B','C','D'].map(o=>`<td><input type="radio" name="q${i}" value="${o}" ${o==='A'?'required':''}></td>`).join('')}
+      </tr>`);
+  }
+}
+
+function renderTF(parent){
+  parent.insertAdjacentHTML('beforeend',`
+    <h2 class="section-title">PHẦN II – Đúng / Sai (4 câu, mỗi câu 4 ý a–d)</h2>
+    <p class="note">Chọn "Đúng" hoặc "Sai" cho từng ý.</p>
+    <div id="tfContainer"></div>`);
+  const ct=document.getElementById('tfContainer');
+  for(let g=1;g<=4;g++){
+    const rows=['a','b','c','d'].map(l=>`
+      <tr>
+        <td>${l})</td>
+        <td><label><input type="radio" name="tf${g}${l}" value="true" required> Đúng</label></td>
+        <td><label><input type="radio" name="tf${g}${l}" value="false"> Sai</label></td>
+      </tr>`).join('');
+    ct.insertAdjacentHTML('beforeend',`
+      <div class="tf-group">
+        <h3>Câu Đ/S ${g}</h3>
+        <table><tbody>${rows}</tbody></table>
+      </div>`);
+  }
+}
+
+function renderSA(parent){
+  parent.insertAdjacentHTML('beforeend',`
+    <h2 class="section-title">PHẦN III – Trả lời ngắn (6 câu)</h2>
+    <div id="saContainer" class="short-answer-group"></div>`);
+  const sc=document.getElementById('saContainer');
+  for(let i=1;i<=6;i++){
+    sc.insertAdjacentHTML('beforeend',`
+      <div>
+        <label for="sa${i}">Câu III.${i}</label>
+        <input type="text" id="sa${i}" name="sa${i}" required>
+      </div>`);
+  }
+}
+
+/* ===================== TIMER & PROGRESS ===================== */
+let timer,totalSecs;
+function startTimer(){
+  totalSecs=50*60; // 50 phút
+  clearInterval(timer);
+  tick();
+  timer=setInterval(tick,1000);
+}
+function tick(){
+  const m=String(Math.floor(totalSecs/60)).padStart(2,'0');
+  const s=String(totalSecs%60).padStart(2,'0');
+  document.getElementById('countdown').textContent=m+":"+s;
+  const mob=document.getElementById('mobileTimer');
+  if(mob) mob.textContent=m+":"+s;
+  if(totalSecs--<=0){
+    clearInterval(timer);
+    alert('Hết giờ! Bài sẽ được nộp tự động.');
+    document.getElementById('quizForm').dispatchEvent(new Event('submit'));
+  }
+}
+const TOTAL=34;
+function updateProgress(){
+  let ans=0;
+  document.querySelectorAll('#quizForm input').forEach(i=>{
+    if(i.type==='radio'&&i.checked) ans++;
+    if(i.type==='text'&&i.value.trim()) ans++;
+  });
+  document.getElementById('progressBar').value=ans;
+  document.getElementById('progressText').textContent=ans+'/'+TOTAL;
+}
+
+/* ===================== SUBMIT HANDLER ===================== */
+function submitHandler(e){
+  e.preventDefault();
+  const data=Object.fromEntries(new FormData(e.target).entries());
+  console.table(data);
+  alert('Nộp bài thành công!');
+  if(window.innerWidth<768) toggleAnswerSheet(false);
+}
+pane=document.getElementById('answerPane'),tgl=document.getElementById('toggleSheet'),cls=document.getElementById('closeSheet');tgl&&tgl.addEventListener('click',()=>{const o=pane.classList.toggle('open');tgl.textContent=o?'Bài làm ▴':'Bài làm ▾';});cls&&cls.addEventListener('click',()=>{pane.classList.remove('open');tgl.textContent='Bài làm ▾';});document.getElementById('submitBtn')?.addEventListener('click',()=>document.getElementById('quizForm').dispatchEvent(new Event('submit')));
 document.getElementById('quizForm').addEventListener('submit',e=>{e.preventDefault();const fd=new FormData(e.target);const o={};for(const [k,v] of fd.entries())o[k]=v;console.table(o);alert('Đã nộp!');});
 </script>
 </body>
